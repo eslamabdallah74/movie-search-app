@@ -1,81 +1,38 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
-</script>
-
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+  <div class="App">
+    <Header :title="'Movie Search App'" />
+    <Search :search="state.search" @search="handleSearch" />
+    <div class="grid" v-if="state.loading">  
+        <span class="p-4 mx-auto text-2xl text-center text-gray-100 bg-gray-900 rounded-md">
+        Loading...<i class="fa-solid fa-spinner animate-spin"></i>
+        </span>
+     </div>
+    <div class="grid grid-cols-4 gap-4 mx-10 movies">
+      <Movie v-for="movie in state.movies" :movie="movie" :key="movie.imdbID" />
     </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+  </div>
 </template>
 
-<style>
-@import './assets/base.css';
+<script>
+  import Header       from './components/Header.vue';
+  import Search       from './components/Search.vue';
+  import Movie        from './components/Movie.vue';
+  import { useMovieApi }  from './hooks/MovieApi'
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-
-  font-weight: normal;
-}
-
-header {
-  line-height: 1.5;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-}
-
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
+  export default {
+    name: 'app',
+    components: {
+      Header, Search, Movie
+    },
+    setup() {
+      const state = useMovieApi();
+      return {
+        state,
+        handleSearch(searchTerm) {
+          state.loading = true;
+          state.search = searchTerm;
+        }
+    };
   }
 }
-
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
-
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-}
-</style>
+</script>
